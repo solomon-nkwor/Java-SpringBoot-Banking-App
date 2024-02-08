@@ -26,9 +26,10 @@ public class UserController {
     UserService userService;
 
     public UserController(UserService userService){
+
         this.userService = userService;
     }
-    @PostMapping("/createuser")
+    @PostMapping("/create-user")
     public ResponseEntity <?>  createAccount(@RequestHeader(value = "apiKey", required = false) String apiKey,
                                                  @Valid @RequestBody UserRequestDTO userRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){

@@ -2,6 +2,7 @@ package com.solomon.nkwor.solomon.bank.Service.impl;
 
 import com.solomon.nkwor.solomon.bank.DTO.AccountInfoDTO;
 import com.solomon.nkwor.solomon.bank.DTO.BankResponseDTO;
+import com.solomon.nkwor.solomon.bank.DTO.EmailDetails;
 import com.solomon.nkwor.solomon.bank.DTO.UserRequestDTO;
 import com.solomon.nkwor.solomon.bank.Model.User;
 import com.solomon.nkwor.solomon.bank.Repository.UserRepository;
@@ -15,10 +16,12 @@ import java.math.BigDecimal;
 @Slf4j
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
+    private EmailService emailService;
 
-    public UserServiceImpl(UserRepository userRepository){
+    public UserServiceImpl(UserRepository userRepository, EmailService emailService){
 
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
     @Override
     public BankResponseDTO createAccount(UserRequestDTO userRequest) {
@@ -45,6 +48,16 @@ public class UserServiceImpl implements UserService{
                 .status("ACTIVE")
                 .build();
         User savedUser = userRepository.save(user);
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(savedUser.getEmail())
+                .subject(AccountUtils.OPEN_ACCOUNT_EMAIL_SUBJECT)
+                .messageBody(AccountUtils.OPEN_ACCOUNT_EMAIL_MESSAGE + "\n"
+                        + "Account number: " + savedUser.getAccountNumber() + "\n"
+                        + "Account name: " + savedUser.getFirstName() + " "
+                        + savedUser.getMiddleName() + " " + savedUser.getLastName() + "\n"
+                        + "Account balance: " + savedUser.getAccountBalance())
+                .build();
+        emailService.sendEmailAlerts(emailDetails);
         return BankResponseDTO.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREATION_SUCCESS_STATUS)
                 .responseMessage(AccountUtils.ACCOUNT_CREATION_SUCCESS_MESSAGE)
