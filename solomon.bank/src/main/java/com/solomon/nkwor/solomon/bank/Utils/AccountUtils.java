@@ -15,6 +15,24 @@ public class AccountUtils {
     public static final String OPEN_ACCOUNT_EMAIL_SUBJECT = "Account Creation - Welcome to the Family";
     public static final String OPEN_ACCOUNT_EMAIL_MESSAGE = "Congratulations! You have successfully opened an account with us!\n" +
             "Your Account Details: ";
+    public static final String ACCOUNT_NOT_EXIST_CODE = "003";
+    public static final String ACCOUNT_NOT_EXIST_MESSAGE = "User with this account does not exist, please enter a valid account number";
+    public static final String ACCOUNT_FOUND_CODE = "004";
+    public static final String ACCOUNT_FOUND_MESSAGE = "Success!";
+    public static final String CREDITED_SUCCESS_CODE = "005";
+    public static final String CREDITED_SUCCESS_MESSAGE = "Successfully credited your account";
+    public static final String DEBITED_SUCCESS_CODE = "006";
+    public static final String DEBITED_SUCCESS_MESSAGE = "Successfully debited your account";
+    public static final String INSUFFICIENT_FUNDS_CODE = "007";
+    public static final String INSUFFICIENT_FUNDS_MESSAGE = "Insufficient funds";
+    public static final String CREDIT_ACCOUNT_EMAIL_SUBJECT = "Notification! Account Credited";
+    public static final String DEBIT_ACCOUNT_EMAIL_SUBJECT = "Notification! Account Debited";
+    public static final String DEBIT_ACCOUNT_EMAIL_MESSAGE = "Debit alert Notification\n" + "\n " +
+            "A debit transaction occurred in your account with the following details: ";
+    public static final String CREDIT_ACCOUNT_EMAIL_MESSAGE = "Credit alert Notification\n" + "\n " +
+            "A credit transaction occurred in your account with the following details: ";
+
+
 
 
     public static String generateAccountNumber() {

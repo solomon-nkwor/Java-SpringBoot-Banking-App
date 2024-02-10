@@ -1,9 +1,6 @@
 package com.solomon.nkwor.solomon.bank.Service.impl;
 
-import com.solomon.nkwor.solomon.bank.DTO.AccountInfoDTO;
-import com.solomon.nkwor.solomon.bank.DTO.BankResponseDTO;
-import com.solomon.nkwor.solomon.bank.DTO.EmailDetails;
-import com.solomon.nkwor.solomon.bank.DTO.UserRequestDTO;
+import com.solomon.nkwor.solomon.bank.DTO.*;
 import com.solomon.nkwor.solomon.bank.Model.User;
 import com.solomon.nkwor.solomon.bank.Repository.UserRepository;
 import com.solomon.nkwor.solomon.bank.Utils.AccountUtils;
@@ -11,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Service
 @Slf4j
@@ -68,4 +66,129 @@ public class UserServiceImpl implements UserService{
                         .build())
                 .build();
     }
+
+    @Override
+    public BankResponseDTO balanceEnquiry(EnquiryRequest enquiryRequest) {
+        boolean isAccountExists = userRepository.existsByAccountNumber(enquiryRequest.getAccountNumber());
+
+        if (!isAccountExists){
+            return BankResponseDTO.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+        User foundUser = userRepository.findByAccountNumber(enquiryRequest.getAccountNumber());
+
+        return BankResponseDTO.builder()
+                .responseCode(AccountUtils.ACCOUNT_FOUND_CODE)
+                .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
+                .accountInfo(AccountInfoDTO.builder()
+                        .accountBalance(foundUser.getAccountBalance())
+                        .accountName(foundUser.getFirstName() + " " + foundUser.getMiddleName() + " " + foundUser.getLastName())
+                        .accountNumber(foundUser.getAccountNumber())
+                        .build())
+                .build();
+    }
+
+    @Override
+    public String nameEnquiry(EnquiryRequest enquiryRequest) {
+        boolean isAccountExist = userRepository.existsByAccountNumber(enquiryRequest.getAccountNumber());
+
+        if (!isAccountExist){
+            return AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE;
+        }
+        User foundUser = userRepository.findByAccountNumber(enquiryRequest.getAccountNumber());
+
+        return foundUser.getFirstName() + " " + foundUser.getMiddleName() + " " + foundUser.getLastName();
+    }
+
+    @Override
+    public BankResponseDTO creditAccount(CreditDebitRequestDTO creditRequest) {
+        boolean isAccountExist = userRepository.existsByAccountNumber(creditRequest.getAccountNumber());
+
+        if (!isAccountExist){
+            return BankResponseDTO.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+
+        User creditToUser = userRepository.findByAccountNumber(creditRequest.getAccountNumber());
+
+        creditToUser.setAccountBalance(creditToUser.getAccountBalance().add(creditRequest.getAmount()));
+        User creditedUser = userRepository.save(creditToUser);
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(creditedUser.getEmail())
+                .subject(AccountUtils.CREDIT_ACCOUNT_EMAIL_SUBJECT)
+                .messageBody(AccountUtils.CREDIT_ACCOUNT_EMAIL_MESSAGE + "\n"
+                        + "Account number: " + creditedUser.getAccountNumber() + "\n"
+                        + "Account name: " + creditedUser.getFirstName() + " "
+                        + creditedUser.getMiddleName() + " " + creditedUser.getLastName() + "\n"
+                        + " Transaction type: Deposit" + "\n"
+                        + "Amount credited: " + creditRequest.getAmount() + "\n"
+                        + "Account balance: " + creditedUser.getAccountBalance())
+                .build();
+        emailService.sendEmailAlerts(emailDetails);
+        return BankResponseDTO.builder()
+                .responseCode(AccountUtils.CREDITED_SUCCESS_CODE)
+                .responseMessage(AccountUtils.CREDITED_SUCCESS_MESSAGE)
+                .accountInfo(AccountInfoDTO.builder()
+                        .accountName(creditToUser.getFirstName() + " " + creditToUser.getLastName())
+                        .accountNumber(creditToUser.getAccountNumber())
+                        .accountBalance(creditedUser.getAccountBalance())
+                        .build())
+                .build();
+    }
+
+    @Override
+    public BankResponseDTO debitAccount(CreditDebitRequestDTO debitRequest) {
+        boolean isAccountExist = userRepository.existsByAccountNumber(debitRequest.getAccountNumber());
+
+        if (!isAccountExist){
+            return BankResponseDTO.builder()
+                    .responseCode(AccountUtils.ACCOUNT_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_NOT_EXIST_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+
+        User debitUser = userRepository.findByAccountNumber(debitRequest.getAccountNumber());
+//        to run a comparison with Big decimal values, you have to invoke the 'intvalue()' method
+//        because normal comparisons don't work with big decimals
+
+        if (debitUser.getAccountBalance().intValue() < debitRequest.getAmount().intValue()){
+            return BankResponseDTO.builder()
+                    .responseCode(AccountUtils.INSUFFICIENT_FUNDS_CODE)
+                    .responseMessage(AccountUtils.INSUFFICIENT_FUNDS_MESSAGE)
+                    .accountInfo(null)
+                    .build();
+        }
+        debitUser.setAccountBalance(debitUser.getAccountBalance().subtract(debitRequest.getAmount()));
+        User debitedtedUser = userRepository.save(debitUser);
+            EmailDetails emailDetails = EmailDetails.builder()
+                    .recipient(debitedtedUser.getEmail())
+                    .subject(AccountUtils.DEBIT_ACCOUNT_EMAIL_SUBJECT)
+                    .messageBody(AccountUtils.DEBIT_ACCOUNT_EMAIL_MESSAGE + "\n"
+                            + "Account number: " + debitedtedUser.getAccountNumber() + "\n"
+                            + "Account name: " + debitedtedUser.getFirstName() + " "
+                            + debitedtedUser.getMiddleName() + " " + debitedtedUser.getLastName() + "\n"
+                            + " Transaction type: Withdrawal \n"
+                            + "Amount debited: " + debitRequest.getAmount() + "\n"
+                            + "Account balance: " + debitedtedUser.getAccountBalance())
+                    .build();
+            emailService.sendEmailAlerts(emailDetails);
+        return BankResponseDTO.builder()
+                .responseCode(AccountUtils.DEBITED_SUCCESS_CODE)
+                .responseMessage(AccountUtils.DEBITED_SUCCESS_MESSAGE)
+                .accountInfo(AccountInfoDTO.builder()
+                        .accountName(debitUser.getFirstName() + " " + debitUser.getLastName())
+                        .accountNumber(debitUser.getAccountNumber())
+                        .accountBalance(debitedtedUser.getAccountBalance())
+                        .build())
+                .build();
+
+    }
+
 }

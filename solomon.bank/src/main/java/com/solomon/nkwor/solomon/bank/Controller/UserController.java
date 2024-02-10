@@ -1,6 +1,8 @@
 package com.solomon.nkwor.solomon.bank.Controller;
 
 import com.solomon.nkwor.solomon.bank.DTO.BankResponseDTO;
+import com.solomon.nkwor.solomon.bank.DTO.CreditDebitRequestDTO;
+import com.solomon.nkwor.solomon.bank.DTO.EnquiryRequest;
 import com.solomon.nkwor.solomon.bank.DTO.UserRequestDTO;
 import com.solomon.nkwor.solomon.bank.Service.impl.UserService;
 import jakarta.validation.Valid;
@@ -44,6 +46,68 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
 
 
+    }
+
+    @GetMapping("/balance-enquiry")
+    public ResponseEntity <?> balanceEnquiry(@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                             @Valid @RequestBody EnquiryRequest enquiryRequest){
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+
+        log.info("Get balance started");
+
+        BankResponseDTO foundUser = userService.balanceEnquiry(enquiryRequest);
+        log.info("Get Balance completed");
+        return ResponseEntity.status(HttpStatus.FOUND).body(foundUser);
+
+    }
+
+    @GetMapping("/name-enquiry")
+    public ResponseEntity <?> nameEnquiry(@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                             @Valid @RequestBody EnquiryRequest enquiryRequest){
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+
+        log.info("Name Enquiry started");
+
+        String foundUser = userService.nameEnquiry(enquiryRequest);
+        log.info("Name Enquiry completed");
+        return ResponseEntity.status(HttpStatus.FOUND).body(foundUser);
+
+    }
+
+    @PostMapping("/credit-user")
+    public ResponseEntity <?> creditUser (@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                          @Valid @RequestBody CreditDebitRequestDTO creditRequest){
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+
+        log.info("Credit user started");
+
+        BankResponseDTO userToCredit = userService.creditAccount(creditRequest);
+        log.info("Credit user completed");
+        return ResponseEntity.status(HttpStatus.OK).body(userToCredit);
+    }
+
+    @PostMapping("/debit-user")
+    public ResponseEntity <?> debitUser (@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                          @Valid @RequestBody CreditDebitRequestDTO debitRequest){
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+
+        log.info("Debit user started");
+
+        BankResponseDTO userToCredit = userService.debitAccount(debitRequest);
+        log.info("Debit user completed");
+        return ResponseEntity.status(HttpStatus.OK).body(userToCredit);
     }
 
 
