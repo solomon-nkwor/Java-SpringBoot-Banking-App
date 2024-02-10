@@ -1,5 +1,6 @@
 package com.solomon.nkwor.solomon.bank.Service.impl;
 
+import com.solomon.nkwor.solomon.bank.Converter.UserConverter;
 import com.solomon.nkwor.solomon.bank.DTO.*;
 import com.solomon.nkwor.solomon.bank.Model.User;
 import com.solomon.nkwor.solomon.bank.Repository.UserRepository;
@@ -8,7 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -16,10 +18,13 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private EmailService emailService;
 
-    public UserServiceImpl(UserRepository userRepository, EmailService emailService){
+    private UserConverter userConverter;
+
+    public UserServiceImpl(UserRepository userRepository, EmailService emailService, UserConverter userConverter){
 
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.userConverter = userConverter;
     }
     @Override
     public BankResponseDTO createAccount(UserRequestDTO userRequest) {
@@ -188,7 +193,45 @@ public class UserServiceImpl implements UserService{
                         .accountBalance(debitedtedUser.getAccountBalance())
                         .build())
                 .build();
+// the next thing to do is to incorporate transfer services from one account to the other
+    }
+
+    @Override
+    public List<GetUserDTO> getAllUsers() {
+        log.info("Get all Users Started");
+        List<User> allUsers =userRepository.findAll();
+        log.info("Get all users completed");
+        return allUsers.stream().map(user -> userConverter.convertUserToDTO(user))
+            .collect(Collectors.toList());
 
     }
+
+    @Override
+    public GetUserDTO getUsersByAccountNumber(String accountNumber) {
+        log.info("Get User by Account Number Started");
+        User user = userRepository.findByAccountNumber(accountNumber);
+        if(user != null){
+            log.info("Get User by Account Number completed");
+            return userConverter.convertUserToDTO(user);
+        }
+        else{
+            return null;
+        }
+
+    }
+
+    @Override
+    public GetUserDTO getUsersByID(String id) {
+        log.info("getUserByID Started");
+        User user = userRepository.findById(id).orElse(null);
+        if(user != null){
+            log.info("getUserByID completed");
+            return userConverter.convertUserToDTO(user);
+        }
+        else{
+            return null;
+        }
+    }
+
 
 }

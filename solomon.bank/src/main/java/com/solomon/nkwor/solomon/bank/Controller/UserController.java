@@ -1,9 +1,6 @@
 package com.solomon.nkwor.solomon.bank.Controller;
 
-import com.solomon.nkwor.solomon.bank.DTO.BankResponseDTO;
-import com.solomon.nkwor.solomon.bank.DTO.CreditDebitRequestDTO;
-import com.solomon.nkwor.solomon.bank.DTO.EnquiryRequest;
-import com.solomon.nkwor.solomon.bank.DTO.UserRequestDTO;
+import com.solomon.nkwor.solomon.bank.DTO.*;
 import com.solomon.nkwor.solomon.bank.Service.impl.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -108,6 +106,39 @@ public class UserController {
         BankResponseDTO userToCredit = userService.debitAccount(debitRequest);
         log.info("Debit user completed");
         return ResponseEntity.status(HttpStatus.OK).body(userToCredit);
+    }
+
+    @GetMapping("/all-users")
+    public ResponseEntity <?> getAllUsers (@RequestHeader(value = "apiKey", required = false) String apiKey){
+
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+        List<GetUserDTO> users = userService.getAllUsers();
+        return ResponseEntity.status(HttpStatus.FOUND).body(users);
+    }
+
+    @GetMapping("/by-id/{id}")
+    public ResponseEntity<?> getUsersById(@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                          @PathVariable String id){
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+        GetUserDTO user = userService.getUsersByID(id);
+        return ResponseEntity.status(HttpStatus.FOUND).body(user);
+    }
+
+    @GetMapping("/by-account-number/{accountNumber}")
+    public ResponseEntity<?> getUsersByAccountNumber(@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                                     @PathVariable String accountNumber){
+        if (apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+        GetUserDTO user = userService.getUsersByAccountNumber(accountNumber);
+        return ResponseEntity.status(HttpStatus.FOUND).body(user);
     }
 
 

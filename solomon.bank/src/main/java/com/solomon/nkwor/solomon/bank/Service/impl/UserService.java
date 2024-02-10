@@ -1,9 +1,8 @@
 package com.solomon.nkwor.solomon.bank.Service.impl;
 
-import com.solomon.nkwor.solomon.bank.DTO.BankResponseDTO;
-import com.solomon.nkwor.solomon.bank.DTO.CreditDebitRequestDTO;
-import com.solomon.nkwor.solomon.bank.DTO.EnquiryRequest;
-import com.solomon.nkwor.solomon.bank.DTO.UserRequestDTO;
+import com.solomon.nkwor.solomon.bank.DTO.*;
+
+import java.util.List;
 
 public interface UserService {
     BankResponseDTO createAccount(UserRequestDTO userRequest);
@@ -14,5 +13,10 @@ public interface UserService {
 
     BankResponseDTO creditAccount(CreditDebitRequestDTO creditRequest);
     BankResponseDTO debitAccount(CreditDebitRequestDTO debitRequest);
+
+    List<GetUserDTO> getAllUsers();
+
+    GetUserDTO getUsersByID(String id);
+    GetUserDTO getUsersByAccountNumber(String accountNumber);
 
 }
