@@ -32,6 +32,9 @@ public class AccountUtils {
     public static final String CREDIT_ACCOUNT_EMAIL_MESSAGE = "Credit alert Notification\n" + "\n " +
             "A credit transaction occurred in your account with the following details: ";
 
+    public static final String TRANSFER_RESPONSE_CODE = "008";
+    public static final String TRANSFER_SUCCESS_MESSAGE = "Transfer Successful";
+
 
 
 

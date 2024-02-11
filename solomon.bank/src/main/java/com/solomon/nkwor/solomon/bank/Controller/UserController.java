@@ -108,6 +108,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userToCredit);
     }
 
+    @PostMapping("/transfer")
+    public ResponseEntity<?> transfer(@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                      @Valid @RequestBody TransferDTO transferRequest){
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+
+        log.info("Transfer started");
+        BankResponseDTO transfer = userService.transfer(transferRequest);
+        log.info("Transfer complete");
+        return ResponseEntity.status(HttpStatus.OK).body(transfer);
+    }
+
     @GetMapping("/all-users")
     public ResponseEntity <?> getAllUsers (@RequestHeader(value = "apiKey", required = false) String apiKey){
 
