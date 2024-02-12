@@ -2,6 +2,12 @@ package com.solomon.nkwor.solomon.bank.Controller;
 
 import com.solomon.nkwor.solomon.bank.DTO.*;
 import com.solomon.nkwor.solomon.bank.Service.impl.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/user")
 @Slf4j
+@Tag(name = "Banking Application API")
 public class UserController {
     @Value("${apiKey}")
     private String API_KEY;
@@ -30,6 +37,13 @@ public class UserController {
         this.userService = userService;
     }
     @PostMapping("/create-user")
+    @Operation(summary = "Registers New Users to the Bank")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created a new user",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserRequestDTO.class)) }),
+            @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Failed to create new user", content = @Content)
+    })
     public ResponseEntity <?>  createAccount(@RequestHeader(value = "apiKey", required = false) String apiKey,
                                                  @Valid @RequestBody UserRequestDTO userRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){
@@ -47,6 +61,13 @@ public class UserController {
     }
 
     @GetMapping("/balance-enquiry")
+    @Operation(summary = "Retrieves account balance of user when account number is provided")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful!",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EnquiryRequest.class)) }),
+            @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Failed to fetch data", content = @Content)
+    })
     public ResponseEntity <?> balanceEnquiry(@RequestHeader(value = "apiKey", required = false) String apiKey,
                                              @Valid @RequestBody EnquiryRequest enquiryRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){
@@ -63,6 +84,13 @@ public class UserController {
     }
 
     @GetMapping("/name-enquiry")
+    @Operation(summary = "Retrieves name of user when account number is provided")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful!",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EnquiryRequest.class)) }),
+            @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Failed to fetch data", content = @Content)
+    })
     public ResponseEntity <?> nameEnquiry(@RequestHeader(value = "apiKey", required = false) String apiKey,
                                              @Valid @RequestBody EnquiryRequest enquiryRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){

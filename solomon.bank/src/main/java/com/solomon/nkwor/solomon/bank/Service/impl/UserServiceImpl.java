@@ -86,7 +86,16 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
         User foundUser = userRepository.findByAccountNumber(enquiryRequest.getAccountNumber());
-
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(foundUser.getEmail())
+                .subject("Your Balance Enquiry Request!")
+                .messageBody("Dear " + foundUser.getFirstName() + "\n " + "Please find the account balance for the account below " + "\n"
+                        + "Account number: " + foundUser.getAccountNumber() + "\n"
+                        + "Account name: " + foundUser.getFirstName() + " "
+                        + foundUser.getMiddleName() + " " + foundUser.getLastName() + "\n"
+                        + "Account balance: " + foundUser.getAccountBalance())
+                .build();
+        emailService.sendEmailAlerts(emailDetails);
         return BankResponseDTO.builder()
                 .responseCode(AccountUtils.ACCOUNT_FOUND_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
