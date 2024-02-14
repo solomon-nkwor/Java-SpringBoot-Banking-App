@@ -40,7 +40,7 @@ public class UserController {
     @Operation(summary = "Registers New Users to the Bank")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created a new user",
-            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserRequestDTO.class)) }),
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class)) }),
             @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
             @ApiResponse(responseCode = "401", description = "Failed to create new user", content = @Content)
     })
@@ -64,12 +64,16 @@ public class UserController {
     @Operation(summary = "Retrieves account balance of user when account number is provided")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful!",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EnquiryRequest.class)) }),
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class)) }),
             @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
             @ApiResponse(responseCode = "401", description = "Failed to fetch data", content = @Content)
     })
     public ResponseEntity <?> balanceEnquiry(@RequestHeader(value = "apiKey", required = false) String apiKey,
-                                             @Valid @RequestBody EnquiryRequest enquiryRequest){
+                                             @Valid @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                     description = "Request body for balance enquiry",
+                                                     required = true,
+                                                     content = @Content(mediaType = "application/json",
+                                                             schema = @Schema(implementation = EnquiryRequest.class))) EnquiryRequest enquiryRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){
             log.error("Invalid API Key");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
@@ -87,12 +91,16 @@ public class UserController {
     @Operation(summary = "Retrieves name of user when account number is provided")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful!",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EnquiryRequest.class)) }),
+                    content = {@Content(mediaType = "String", schema = @Schema(implementation = String.class)) }),
             @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
             @ApiResponse(responseCode = "401", description = "Failed to fetch data", content = @Content)
     })
     public ResponseEntity <?> nameEnquiry(@RequestHeader(value = "apiKey", required = false) String apiKey,
-                                             @Valid @RequestBody EnquiryRequest enquiryRequest){
+                                             @Valid @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                     description = "Request body for name enquiry",
+                                                     required = true,
+                                                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = EnquiryRequest.class))
+                                             ) EnquiryRequest enquiryRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){
             log.error("Invalid API Key");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
@@ -107,6 +115,13 @@ public class UserController {
     }
 
     @PostMapping("/credit-user")
+    @Operation(summary = "credits user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successful!",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class)) }),
+            @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Failed to complete", content = @Content)
+    })
     public ResponseEntity <?> creditUser (@RequestHeader(value = "apiKey", required = false) String apiKey,
                                           @Valid @RequestBody CreditDebitRequestDTO creditRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){
@@ -122,6 +137,13 @@ public class UserController {
     }
 
     @PostMapping("/debit-user")
+    @Operation(summary = "Debits user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successful!",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class)) }),
+            @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Failed to complete", content = @Content)
+    })
     public ResponseEntity <?> debitUser (@RequestHeader(value = "apiKey", required = false) String apiKey,
                                           @Valid @RequestBody CreditDebitRequestDTO debitRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){
@@ -137,6 +159,13 @@ public class UserController {
     }
 
     @PostMapping("/transfer")
+    @Operation(summary = "transfers funds between two users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successful!",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class)) }),
+            @ApiResponse(responseCode = "403", description = "Authorization Failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Failed to complete", content = @Content)
+    })
     public ResponseEntity<?> transfer(@RequestHeader(value = "apiKey", required = false) String apiKey,
                                       @Valid @RequestBody TransferDTO transferRequest){
         if(apiKey == null || !apiKey.equals(API_KEY)){
@@ -151,6 +180,14 @@ public class UserController {
     }
 
     @GetMapping("/all-users")
+    @Operation(summary = "Retrieves all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful!",
+            content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Authorization failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authorization failed", content = @Content)
+    })
+
     public ResponseEntity <?> getAllUsers (@RequestHeader(value = "apiKey", required = false) String apiKey){
 
         if(apiKey == null || !apiKey.equals(API_KEY)){
@@ -162,6 +199,13 @@ public class UserController {
     }
 
     @GetMapping("/by-id/{id}")
+    @Operation(summary = "Retrieves users by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful!",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Authorization failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authorization failed", content = @Content)
+    })
     public ResponseEntity<?> getUsersById(@RequestHeader(value = "apiKey", required = false) String apiKey,
                                           @PathVariable String id){
         if(apiKey == null || !apiKey.equals(API_KEY)){
@@ -173,6 +217,13 @@ public class UserController {
     }
 
     @GetMapping("/by-account-number/{accountNumber}")
+    @Operation(summary = "Retrieves users by Account Number")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful!",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BankResponseDTO.class))}),
+            @ApiResponse(responseCode = "403", description = "Authorization failed", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authorization failed", content = @Content)
+    })
     public ResponseEntity<?> getUsersByAccountNumber(@RequestHeader(value = "apiKey", required = false) String apiKey,
                                                      @PathVariable String accountNumber){
         if (apiKey == null || !apiKey.equals(API_KEY)){
