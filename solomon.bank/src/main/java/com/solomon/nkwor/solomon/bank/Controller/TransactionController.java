@@ -1,5 +1,6 @@
 package com.solomon.nkwor.solomon.bank.Controller;
 
+import com.itextpdf.text.DocumentException;
 import com.solomon.nkwor.solomon.bank.Model.Transactions;
 import com.solomon.nkwor.solomon.bank.Service.impl.BankStatement;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 @RestController
@@ -28,7 +30,7 @@ public class TransactionController {
     }
     @GetMapping
     public ResponseEntity<?> getBankStatement(@RequestHeader (value = "apiKey", required = false) String apiKey, @RequestParam String accountNumber, @RequestParam String startDate,
-                                              @RequestParam String endDate){
+                                              @RequestParam String endDate) throws DocumentException, FileNotFoundException {
 
         if(apiKey == null || !apiKey.equals(API_KEY)){
             log.error("Invalid API Key");
