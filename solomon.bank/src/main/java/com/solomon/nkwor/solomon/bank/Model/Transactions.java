@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -26,6 +28,8 @@ public class Transactions {
     private String accountNumber;
     private String status;
     @CreationTimestamp
-    private LocalDateTime transactionTime;
+    private LocalDate transactionTime;
+    @UpdateTimestamp
+    private LocalDate modifiedAt;
 
 }
