@@ -32,6 +32,7 @@ public class BankStatement {
 
     private UserRepository userRepository;
 
+
     private static final String FILE ="C:\\Users\\SolomonNkwor\\OneDrive - Trium Limited\\Desktop\\BankStatement.pdf";
 
 //    public BankStatement(TransactionRepository transactionRepository){
@@ -43,6 +44,9 @@ public class BankStatement {
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE);
 
         User user = userRepository.findByAccountNumber(accountNumber);
+
+        List <Transactions> transactionList = transactionRepository.findAll().stream().filter(transactions -> transactions.getAccountNumber().equals(accountNumber))
+                .filter(transactions -> transactions.getTransactionTime().isEqual(start)).filter(transactions -> transactions.getTransactionTime().isEqual(end)).toList();
 
         String customerName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
         Rectangle statementSize = new Rectangle(PageSize.A4);
@@ -61,7 +65,7 @@ public class BankStatement {
 
         PdfPCell bankName = new PdfPCell(new Phrase("Solomon Bank"));
         bankName.setBorder(0);
-        bankName.setBackgroundColor(BaseColor.BLUE);
+        bankName.setBackgroundColor(BaseColor.GRAY);
         bankName.setPadding(20f);
 
         PdfPCell bankAddress = new PdfPCell(new Phrase("72, VI, Lagos, Nigeria"));
@@ -80,10 +84,60 @@ public class BankStatement {
         PdfPCell stopDate = new PdfPCell(new Phrase("End Date: " + endDate));
         stopDate.setBorder(0);
 
+        PdfPCell name = new PdfPCell(new Phrase("Customer Name: " + customerName));
+        name.setBorder(0);
+        PdfPCell space = new PdfPCell();
+        space.setBorder(0);
+        PdfPCell address = new PdfPCell(new Phrase("Customer Address: " + user.getAddress()));
+        address.setBorder(0);
 
 
-        return transactionRepository.findAll().stream().filter(transactions -> transactions.getAccountNumber().equals(accountNumber))
-                .filter(transactions -> transactions.getTransactionTime().isEqual(start)).filter(transactions -> transactions.getTransactionTime().isEqual(end)).toList();
+        PdfPTable transactionsTable = new PdfPTable(4);
+
+        PdfPCell date = new PdfPCell(new Phrase("DATE"));
+        date.setBackgroundColor(BaseColor.GRAY);
+        date.setBorder(0);
+
+        PdfPCell transactionType = new PdfPCell(new Phrase("TRANSACTION TYPE"));
+        transactionType.setBorder(0);
+        transactionType.setBackgroundColor(BaseColor.GRAY);
+
+        PdfPCell amount = new PdfPCell(new Phrase("TRANSACTION AMOUNT"));
+        amount.setBackgroundColor(BaseColor.GRAY);
+        amount.setBorder(0);
+
+        PdfPCell status = new PdfPCell(new Phrase("STATUS"));
+        status.setBorder(0);
+        status.setBackgroundColor(BaseColor.GRAY);
+
+        transactionsTable.addCell(date);
+        transactionsTable.addCell(transactionType);
+        transactionsTable.addCell(amount);
+        transactionsTable.addCell(status);
+
+        transactionList.forEach(transactions -> {
+            transactionsTable.addCell(new Phrase(transactions.getTransactionTime().toString()));
+            transactionsTable.addCell(new Phrase(transactions.getTransactionType()));
+            transactionsTable.addCell(new Phrase(transactions.getAmount().toString()));
+            transactionsTable.addCell(new Phrase(transactions.getStatus()));
+        });
+
+        statementInfo.addCell(customerInfo);
+        statementInfo.addCell(statement);
+        statementInfo.addCell(stopDate);
+        statementInfo.addCell(name);
+        statementInfo.addCell(space);
+        statementInfo.addCell(address);
+
+
+
+        document.add(bankInfoTable);
+        document.add(statementInfo);
+        document.add(transactionsTable);
+
+        document.close();
+
+        return transactionList;
     }
 
 }
