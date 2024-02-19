@@ -17,6 +17,7 @@ public class TransactionDTO {
     private String transactionType;
     private BigDecimal amount;
     private String accountNumber;
+    private String debitedAccountNumber;
     private String status;
     private LocalDate transactionTime;
 }
