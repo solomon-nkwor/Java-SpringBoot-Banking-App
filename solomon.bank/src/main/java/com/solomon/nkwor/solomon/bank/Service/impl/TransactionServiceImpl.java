@@ -24,6 +24,8 @@ public class TransactionServiceImpl implements TransactionService{
                 .amount(transactionDTO.getAmount())
                 .accountNumber(transactionDTO.getAccountNumber())
                 .debitedAccountNumber(transactionDTO.getDebitedAccountNumber())
+                .accountBalance(transactionDTO.getAccountBalance())
+                .sourceAccountBalance(transactionDTO.getSourceAccountBalance())
                 .status("Success")
                 .transactionTime(transactionDTO.getTransactionTime())
                 .build();

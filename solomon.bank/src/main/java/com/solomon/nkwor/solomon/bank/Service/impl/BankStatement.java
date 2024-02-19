@@ -92,7 +92,7 @@ public class BankStatement {
         address.setBorder(0);
 
 
-        PdfPTable transactionsTable = new PdfPTable(4);
+        PdfPTable transactionsTable = new PdfPTable(5);
 
         PdfPCell date = new PdfPCell(new Phrase("DATE"));
         date.setBackgroundColor(BaseColor.GRAY);
@@ -110,16 +110,22 @@ public class BankStatement {
         status.setBorder(0);
         status.setBackgroundColor(BaseColor.GRAY);
 
+        PdfPCell balance = new PdfPCell(new Phrase("BALANCE"));
+        status.setBorder(0);
+        status.setBackgroundColor(BaseColor.GRAY);
+
         transactionsTable.addCell(date);
         transactionsTable.addCell(transactionType);
         transactionsTable.addCell(amount);
         transactionsTable.addCell(status);
+        transactionsTable.addCell(balance);
 
         transactionList.forEach(transactions -> {
             transactionsTable.addCell(new Phrase(transactions.getTransactionTime().toString()));
             transactionsTable.addCell(new Phrase(transactions.getTransactionType()));
             transactionsTable.addCell(new Phrase(transactions.getAmount().toString()));
             transactionsTable.addCell(new Phrase(transactions.getStatus()));
+            transactionsTable.addCell(new Phrase(transactions.getAccountBalance().toString()));
         });
 
         statementInfo.addCell(customerInfo);

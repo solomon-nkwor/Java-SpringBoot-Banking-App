@@ -27,6 +27,8 @@ public class Transactions {
     private BigDecimal amount;
     private String accountNumber;
     private String debitedAccountNumber;
+    private BigDecimal accountBalance;
+    private BigDecimal sourceAccountBalance;
     private String status;
     @CreationTimestamp
     private LocalDate transactionTime;

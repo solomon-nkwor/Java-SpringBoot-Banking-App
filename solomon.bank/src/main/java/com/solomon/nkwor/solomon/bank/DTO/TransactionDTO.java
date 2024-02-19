@@ -18,6 +18,8 @@ public class TransactionDTO {
     private BigDecimal amount;
     private String accountNumber;
     private String debitedAccountNumber;
+    private BigDecimal accountBalance;
+    private BigDecimal sourceAccountBalance;
     private String status;
     private LocalDate transactionTime;
 }
