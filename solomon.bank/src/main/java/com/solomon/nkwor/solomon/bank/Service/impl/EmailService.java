@@ -4,4 +4,5 @@ import com.solomon.nkwor.solomon.bank.DTO.EmailDetails;
 
 public interface EmailService {
     void sendEmailAlerts(EmailDetails emailDetails);
+    void sendEmailAttachment(EmailDetails emailDetails);
 }

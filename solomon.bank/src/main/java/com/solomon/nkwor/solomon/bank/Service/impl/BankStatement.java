@@ -5,6 +5,7 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.solomon.nkwor.solomon.bank.DTO.EmailDetails;
 import com.solomon.nkwor.solomon.bank.Model.Transactions;
 import com.solomon.nkwor.solomon.bank.Model.User;
 import com.solomon.nkwor.solomon.bank.Repository.TransactionRepository;
@@ -32,6 +33,8 @@ public class BankStatement {
 
     private UserRepository userRepository;
 
+    private EmailService emailService;
+
 
     private static final String FILE ="C:\\Users\\SolomonNkwor\\OneDrive - Trium Limited\\Desktop\\BankStatement.pdf";
 
@@ -45,7 +48,7 @@ public class BankStatement {
 
         User user = userRepository.findByAccountNumber(accountNumber);
 
-        List <Transactions> transactionList = transactionRepository.findAll().stream().filter(transactions -> transactions.getAccountNumber().equals(accountNumber))
+        List <Transactions> transactionList = transactionRepository.findAll().stream().filter(transactions -> transactions.getAccountNumber().equals(accountNumber) || transactions.getDebitedAccountNumber().equals(accountNumber))
                 .filter(transactions -> transactions.getTransactionTime().isEqual(start)).filter(transactions -> transactions.getTransactionTime().isEqual(end)).toList();
 
         String customerName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
@@ -135,13 +138,20 @@ public class BankStatement {
         statementInfo.addCell(space);
         statementInfo.addCell(address);
 
-
-
         document.add(bankInfoTable);
         document.add(statementInfo);
         document.add(transactionsTable);
 
         document.close();
+
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(user.getEmail())
+                .subject("Statement of Account")
+                .messageBody("Kindly find your requested account details from " + start + " to " + end)
+                .attachment(FILE)
+                .build();
+
+        emailService.sendEmailAttachment(emailDetails);
 
         return transactionList;
     }
