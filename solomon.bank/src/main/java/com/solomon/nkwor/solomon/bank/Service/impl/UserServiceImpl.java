@@ -158,6 +158,8 @@ public class UserServiceImpl implements UserService {
                 .transactionType("Credit")
                 .amount(creditRequest.getAmount())
                 .accountBalance(creditToUser.getAccountBalance())
+                .sourceAccountBalance(BigDecimal.valueOf(5000000000000L))
+                .debitedAccountNumber("Bank")
                 .build();
 
         transactionService.saveTransaction(transactionDTO);
@@ -216,6 +218,8 @@ public class UserServiceImpl implements UserService {
                 .transactionType("Debit")
                 .amount(debitRequest.getAmount())
                 .accountBalance(debitUser.getAccountBalance())
+                .sourceAccountBalance(BigDecimal.valueOf(5000000000000L))
+                .debitedAccountNumber("Bank")
                 .build();
 
         transactionService.saveTransaction(transactionDTO);
