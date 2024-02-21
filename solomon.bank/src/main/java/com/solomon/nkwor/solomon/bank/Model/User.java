@@ -31,6 +31,8 @@ public class User {
     private String middleName;
     @Column(name = "email", length = 200, unique = true)
     private String email;
+    @Column(name = "password", length = 200, unique = true)
+    private String password;
     @Column(name = "gender", length = 200)
     private String gender;
     @Column(name = "address", length = 200)

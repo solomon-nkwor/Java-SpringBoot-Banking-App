@@ -47,5 +47,9 @@ public class UserRequestDTO {
     @NotBlank(message = "phone number is required")
     private String phoneNumber;
 
+    @NotNull(message = "password is required")
+    @NotBlank(message = "password is required")
+    private String password;
+
     private String alternativeNumber;
 }

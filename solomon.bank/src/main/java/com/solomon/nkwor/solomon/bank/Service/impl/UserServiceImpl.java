@@ -6,6 +6,7 @@ import com.solomon.nkwor.solomon.bank.Model.User;
 import com.solomon.nkwor.solomon.bank.Repository.UserRepository;
 import com.solomon.nkwor.solomon.bank.Utils.AccountUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.PSource;
@@ -23,13 +24,16 @@ public class UserServiceImpl implements UserService {
 
     private final TransactionService transactionService;
 
+    private PasswordEncoder passwordEncoder;
+
     public UserServiceImpl(UserRepository userRepository, EmailService emailService,
-                           UserConverter userConverter, TransactionService transactionService) {
+                           UserConverter userConverter, TransactionService transactionService, PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.userConverter = userConverter;
         this.transactionService = transactionService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -51,6 +55,7 @@ public class UserServiceImpl implements UserService {
                 .address(userRequest.getAddress())
                 .stateOfOrigin(userRequest.getStateOfOrigin())
                 .phoneNumber(userRequest.getPhoneNumber())
+                .password(userRequest.getPassword())
                 .alternativeNumber(userRequest.getAlternativeNumber())
                 .accountNumber(AccountUtils.generateAccountNumber())
                 .accountBalance(BigDecimal.ZERO)
