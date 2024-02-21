@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
                 .address(userRequest.getAddress())
                 .stateOfOrigin(userRequest.getStateOfOrigin())
                 .phoneNumber(userRequest.getPhoneNumber())
-                .password(userRequest.getPassword())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
                 .alternativeNumber(userRequest.getAlternativeNumber())
                 .accountNumber(AccountUtils.generateAccountNumber())
                 .accountBalance(BigDecimal.ZERO)
