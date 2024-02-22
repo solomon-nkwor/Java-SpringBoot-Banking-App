@@ -60,6 +60,21 @@ public class UserController {
 
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestHeader(value = "apiKey", required = false) String apiKey,
+                                   @Valid@RequestBody LoginDTO loginDTO){
+        if(apiKey == null || !apiKey.equals(API_KEY)){
+            log.error("Invalid API Key");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(BAD_API_KEY);
+        }
+
+        log.info("login user started");
+
+        BankResponseDTO loggedinUser = userService.login(loginDTO);
+        log.info("login user completed");
+        return ResponseEntity.status(HttpStatus.OK).body(loggedinUser);
+    }
+
     @GetMapping("/balance-enquiry")
     @Operation(summary = "Retrieves account balance of user when account number is provided")
     @ApiResponses(value = {

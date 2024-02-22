@@ -22,4 +22,6 @@ public interface UserService {
 
     BankResponseDTO transfer(TransferDTO transferRequest);
 
+    BankResponseDTO login(LoginDTO loginDTO);
+
 }

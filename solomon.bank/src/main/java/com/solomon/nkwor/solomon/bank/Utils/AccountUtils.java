@@ -35,6 +35,9 @@ public class AccountUtils {
     public static final String TRANSFER_RESPONSE_CODE = "008";
     public static final String TRANSFER_SUCCESS_MESSAGE = "Transfer Successful";
 
+    public static final String LOGIN_RESPONSE_CODE = "009";
+    public static final String LOGIN_RESPONSE_MESSAGE = "Successful!";
+
 
 
 

@@ -1,11 +1,15 @@
 package com.solomon.nkwor.solomon.bank.Service.impl;
 
+import com.solomon.nkwor.solomon.bank.Config.JwtTokenProvider;
 import com.solomon.nkwor.solomon.bank.Converter.UserConverter;
 import com.solomon.nkwor.solomon.bank.DTO.*;
 import com.solomon.nkwor.solomon.bank.Model.User;
 import com.solomon.nkwor.solomon.bank.Repository.UserRepository;
 import com.solomon.nkwor.solomon.bank.Utils.AccountUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,22 +22,30 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private EmailService emailService;
+    private final EmailService emailService;
 
-    private UserConverter userConverter;
+    private final UserConverter userConverter;
 
     private final TransactionService transactionService;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     public UserServiceImpl(UserRepository userRepository, EmailService emailService,
-                           UserConverter userConverter, TransactionService transactionService, PasswordEncoder passwordEncoder) {
+                           UserConverter userConverter, TransactionService transactionService,
+                           PasswordEncoder passwordEncoder,
+                           AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
 
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.userConverter = userConverter;
         this.transactionService = transactionService;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -80,6 +92,26 @@ public class UserServiceImpl implements UserService {
                         .accountNumber(savedUser.getAccountNumber())
                         .accountName(savedUser.getFirstName() + " " + savedUser.getLastName() + " " + savedUser.getMiddleName())
                         .build())
+                .build();
+    }
+
+    @Override
+    public BankResponseDTO login(LoginDTO loginDTO) {
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword())
+        );
+
+        EmailDetails loginAlert = EmailDetails.builder()
+                .subject("You Successfully Logged in")
+                .recipient(loginDTO.getEmail())
+                .messageBody("A login happened in your account now. If this wasn't you, please contact your bank")
+                .build();
+        emailService.sendEmailAlerts(loginAlert);
+
+        return BankResponseDTO.builder()
+                .responseCode(AccountUtils.LOGIN_RESPONSE_CODE)
+                .responseMessage(jwtTokenProvider.generateToken(authentication))
                 .build();
     }
 
@@ -333,7 +365,9 @@ public class UserServiceImpl implements UserService {
 
     }
 
-        @Override
+
+
+    @Override
         public GetUserDTO getUsersByID (String id){
             log.info("getUserByID Started");
             User user = userRepository.findById(id).orElse(null);
