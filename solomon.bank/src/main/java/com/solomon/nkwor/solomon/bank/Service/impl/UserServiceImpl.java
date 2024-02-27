@@ -3,6 +3,7 @@ package com.solomon.nkwor.solomon.bank.Service.impl;
 import com.solomon.nkwor.solomon.bank.Config.JwtTokenProvider;
 import com.solomon.nkwor.solomon.bank.Converter.UserConverter;
 import com.solomon.nkwor.solomon.bank.DTO.*;
+import com.solomon.nkwor.solomon.bank.Model.Role;
 import com.solomon.nkwor.solomon.bank.Model.User;
 import com.solomon.nkwor.solomon.bank.Repository.UserRepository;
 import com.solomon.nkwor.solomon.bank.Utils.AccountUtils;
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService {
                 .accountNumber(AccountUtils.generateAccountNumber())
                 .accountBalance(BigDecimal.ZERO)
                 .status("ACTIVE")
+                .role(Role.valueOf("ROLE_USER"))
                 .build();
         User savedUser = userRepository.save(user);
         EmailDetails emailDetails = EmailDetails.builder()
